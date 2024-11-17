@@ -1,0 +1,149 @@
+DROP DATABASE IF EXISTS LIBRARY_MANAGEMENT;
+CREATE DATABASE LIBRARY_MANAGEMENT;
+USE LIBRARY_MANAGEMENT;
+
+CREATE TABLE Books (
+    Book_Id INT AUTO_INCREMENT PRIMARY KEY,
+    Title VARCHAR(255) NOT NULL,
+    Author VARCHAR(255),
+    Genre VARCHAR(50),
+    Published_Year INT,
+    Available BOOLEAN DEFAULT TRUE,
+    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Employees (
+    Employee_Id INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255) NOT NULL,
+    Position VARCHAR(100),
+    Hire_Date DATE,
+    Email VARCHAR(100) UNIQUE,
+    Phone VARCHAR(20),
+    Address VARCHAR(255),
+    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Readers (
+    Reader_Id INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255) NOT NULL,
+    Registration_Date DATE DEFAULT (CURDATE()),
+    Email VARCHAR(100) UNIQUE,
+    Phone VARCHAR(20),
+    Address VARCHAR(255),
+    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Loans (
+    Loan_Id INT AUTO_INCREMENT PRIMARY KEY,
+    Book_Id INT NOT NULL,
+    Reader_Id INT NOT NULL,
+    Employee_Id INT NOT NULL,
+    Loan_Date DATE DEFAULT (CURDATE()),
+    Return_Due_Date DATE NOT NULL,
+    Return_Date DATE,
+    Status ENUM('returned', 'overdue', 'on loan') DEFAULT 'on loan',
+    FOREIGN KEY (Book_Id) REFERENCES Books(Book_Id) ON DELETE CASCADE,
+    FOREIGN KEY (Reader_Id) REFERENCES Readers(Reader_Id) ON DELETE CASCADE,
+    FOREIGN KEY (Employee_Id) REFERENCES Employees(Employee_Id) ON DELETE CASCADE,
+    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE OverdueBooks (
+    Overdue_Id INT AUTO_INCREMENT PRIMARY KEY,
+    Loan_Id INT UNIQUE,
+    Reader_Id INT,
+    Overdue_Days INT,
+    Fine_Amount DECIMAL(10, 2),
+    Calculated_Date DATE DEFAULT (CURDATE()),
+    Payment_Status ENUM('paid', 'unpaid') DEFAULT 'unpaid',
+    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (Loan_Id) REFERENCES Loans(Loan_Id) ON DELETE CASCADE
+);
+
+INSERT INTO Books (Title, Author, Genre, Published_Year, Available) VALUES
+    ('The Catcher in the Rye', 'J.D. Salinger', 'Fiction', 1951, TRUE),
+    ('Brave New World', 'Aldous Huxley', 'Dystopian', 1932, TRUE),
+    ('War and Peace', 'Leo Tolstoy', 'Historical Fiction', 1869, TRUE),
+    ('The Hobbit', 'J.R.R. Tolkien', 'Fantasy', 1937, TRUE),
+    ('The Alchemist', 'Paulo Coelho', 'Philosophical', 1988, TRUE),
+    ('Crime and Punishment', 'Fyodor Dostoevsky', 'Psychological Fiction', 1866, TRUE),
+    ('The Lord of the Rings', 'J.R.R. Tolkien', 'Fantasy', 1954, TRUE),
+    ('Harry Potter and the Philosopher\'s Stone', 'J.K. Rowling', 'Fantasy', 1997, TRUE);
+    
+INSERT INTO Employees (Name, Position, Hire_Date, Email, Phone, Address) VALUES
+    ('Clara Miller', 'Archivist', '2020-07-12', 'clara.m@library.com', '+3456789012', '789 Literature Rd, Citytown'),
+    ('David Brown', 'IT Specialist', '2019-11-30', 'david.b@library.com', '+4567890123', '321 Tech Blvd, Citytown'),
+    ('Eva White', 'Librarian', '2023-01-15', 'eva.w@library.com', '+5678901234', '654 History Ln, Citytown'),
+    ('George King', 'Assistant Librarian', '2020-08-22', 'george.k@library.com', '+6789012345', '987 Fiction Ave, Citytown'),
+    ('Hannah Scott', 'Event Coordinator', '2021-05-10', 'hannah.s@library.com', '+7890123456', '321 Book Rd, Citytown'),
+    ('Isaac Newton', 'Technical Staff', '2020-03-01', 'isaac.n@library.com', '+8901234567', '456 Science St, Citytown'),
+    ('Julia Roberts', 'Research Assistant', '2022-09-15', 'julia.r@library.com', '+9012345678', '789 Archive St, Citytown'),
+    ('Kevin Parker', 'HR Manager', '2021-11-01', 'kevin.p@library.com', '+1234567809', '123 Manager Blvd, Citytown');
+
+INSERT INTO Readers (Name, Registration_Date, Email, Phone, Address) VALUES
+    ('Michael Adams', '2023-04-10', 'michael.adams@example.com', '+9998887777', '333 Pine St, Citytown'),
+    ('Sarah Lee', '2023-05-25', 'sarah.lee@example.com', '+5554443333', '444 Cedar Ln, Citytown'),
+    ('Tom Walker', '2023-06-15', 'tom.walker@example.com', '+2223334444', '555 Spruce Rd, Citytown'),
+    ('Natalie Green', '2023-07-20', 'natalie.green@example.com', '+3332221111', '666 Oak St, Citytown'),
+    ('Oliver Black', '2023-08-05', 'oliver.black@example.com', '+7776665555', '777 Willow Dr, Citytown'),
+    ('Sophia Grey', '2023-09-10', 'sophia.grey@example.com', '+1113335555', '888 Aspen Ave, Citytown'),
+    ('Daniel Carter', '2023-10-01', 'daniel.carter@example.com', '+2224446666', '999 Redwood Ln, Citytown'),
+    ('Ella White', '2023-10-15', 'ella.white@example.com', '+3335557777', '101 Maple Blvd, Citytown');
+
+INSERT INTO Loans (Book_Id, Reader_Id, Employee_Id, Loan_Date, Return_Due_Date, Status) VALUES
+    (1, 1, 1, '2023-11-01', '2023-11-15', 'on loan'),
+    (2, 2, 2, '2023-11-03', '2023-11-17', 'returned');
+
+INSERT INTO Loans (Book_Id, Reader_Id, Employee_Id, Loan_Date, Return_Due_Date, Status) VALUES
+    (1, 1, 1, '2023-11-01', '2023-11-15', 'on loan'),
+    (2, 2, 2, '2023-11-03', '2023-11-17', 'returned'),
+    (3, 3, 3, '2023-11-05', '2023-11-19', 'on loan'),
+    (4, 4, 4, '2023-11-07', '2023-11-21', 'on loan'),
+    (5, 5, 5, '2023-11-09', '2023-11-23', 'returned'),
+    (6, 6, 6, '2023-11-11', '2023-11-25', 'on loan'),
+    (7, 7, 7, '2023-11-13', '2023-11-27', 'on loan'),
+    (8, 8, 8, '2023-11-15', '2023-11-29', 'on loan');
+
+DELIMITER //
+CREATE TRIGGER update_overdue_status
+AFTER UPDATE ON Loans
+FOR EACH ROW
+BEGIN
+    IF NEW.Status = 'overdue' AND OLD.Status = 'on loan' THEN
+        INSERT INTO OverdueBooks (Loan_Id, Overdue_Days, Fine_Amount, Calculated_Date, Payment_Status)
+        VALUES (
+            NEW.Loan_Id,
+            DATEDIFF(CURDATE(), NEW.Return_Due_Date),
+            DATEDIFF(CURDATE(), NEW.Return_Due_Date) * 0.36,
+            CURDATE(),
+            'unpaid'
+        )
+        ON DUPLICATE KEY UPDATE
+            Overdue_Days = DATEDIFF(CURDATE(), NEW.Return_Due_Date),
+            Fine_Amount = DATEDIFF(CURDATE(), NEW.Return_Due_Date) * 0.36,
+            Calculated_Date = CURDATE(),
+            Payment_Status = 'unpaid';
+    END IF;
+    
+    IF NEW.Status = 'returned' THEN
+        UPDATE OverdueBooks
+        SET Payment_Status = 'paid', Calculated_Date = CURDATE()
+        WHERE Loan_Id = NEW.Loan_Id;
+    END IF;
+END //
+DELIMITER ;
+
+SET GLOBAL event_scheduler = ON;
+CREATE EVENT mark_overdue_loans
+ON SCHEDULE EVERY 1 DAY
+DO
+    UPDATE Loans
+    SET Status = 'overdue'
+    WHERE Status = 'on loan' AND Return_Due_Date < CURDATE();
+
+SHOW TABLES;
+SELECT * FROM Books;
+SELECT * FROM Employees;
+SELECT * FROM Readers;
+SELECT * FROM Loans;
+SELECT * FROM OverdueBooks;
